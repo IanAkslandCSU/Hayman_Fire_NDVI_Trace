@@ -66,28 +66,32 @@ ggplot(summer_only,aes(x=ndmi,y=ndvi,color=site)) +
 NDSI_filter <- full_long %>%
   mutate(month = month(DateTime)) %>%
   mutate (year = year(DateTime)) %>%
-  #mutate (site = fulllong(site) %>%
+  mutate (site = site) %>%
+  #mutate (site = site %>%
   filter(month %in% c(1,2,3,4)) %>%
   filter(data %in% 'ndsi') %>%
-  group_by(data,month,year) %>%
+  group_by(data,year) %>%
   summarize(mean_value=mean(value))
 
 NDVI_filter <- full_long %>%
   mutate(month = month(DateTime)) %>%
   mutate (year = year(DateTime)) %>%
+  #mutate (site = site) %>%
   filter(month %in% c(6,7,8)) %>%
   filter(data %in% 'ndvi') %>%
-  group_by(data,month,year) %>%
+  group_by(data,year) %>%
   summarize(mean_value=mean(value))
 
-NDSI_NDVI <- rbind(NDVI_filter,NDSI_filter)
+NDSI_NDVI <- rbind(NDVI_filter,NDSI_filter)%>%
+spread(key=data,value=mean_value)
 
-ggplot(NDSI_NDVI,aes(x=year,y=mean_value,color=data)) + 
+ggplot(NDSI_NDVI,aes(x=ndvi,y=ndsi)) + 
   geom_point() + 
   theme_few() + 
   scale_color_few() + 
   theme(legend.position=c(0.85,0.9))
 
+## No correlation from what I can tell
 ## End code for question 2 -----------------
 
 
@@ -96,12 +100,73 @@ ggplot(NDSI_NDVI,aes(x=year,y=mean_value,color=data)) +
 # and burned and unburned? 
 
 ## Your code here
+NDSI_filterSite <- full_long %>%
+  mutate(month = month(DateTime)) %>%
+  mutate (year = year(DateTime)) %>%
+  mutate (site = site) %>%
+  mutate (treatment = cut(year,breaks=c(0,2003,2020),
+                          labels=c('pre-burn','post-burn'))) %>%
+  filter(month %in% c(1,2,3,4)) %>%
+  filter(data %in% 'ndsi') %>%
+  group_by(data,year,site,treatment) %>%
+  summarize(mean_value=mean(value))
 
+
+NDVI_filterSite <- full_long %>%
+  mutate(month = month(DateTime)) %>%
+  mutate (year = year(DateTime)) %>%
+  mutate (site = site) %>%
+  mutate (treatment = cut(year,breaks=c(0,2003,2020),
+                          labels=c('pre-burn','post-burn'))) %>%
+  filter(month %in% c(6,7,8)) %>%
+  filter(data %in% 'ndvi') %>%
+  group_by(data,year,site,treatment) %>%
+  summarize(mean_value=mean(value))
+
+NDSI_NDVI_site <- rbind(NDVI_filterSite,NDSI_filterSite)%>%
+  spread(key=data,value=mean_value)
+
+ggplot(NDSI_NDVI_site,aes(x=ndsi,y=ndvi,color=treatment)) + 
+  geom_point() + 
+  theme_few() + 
+  scale_color_few() + 
+  theme(legend.position=c(0.85,0.9))
+ggplot(NDSI_NDVI_site,aes(x=ndsi,y=ndvi,color=site)) + 
+  geom_point() + 
+  theme_few() + 
+  scale_color_few() + 
+  theme(legend.position=c(0.85,0.9))
 ## End code for question 3
 
 ###### Question 4 #####
 #What month is the greenest month on average? Does this change in the burned
 # plots after the fire? 
 
+NDVI_filterGreen <- full_long %>%
+  mutate(month = month(DateTime)) %>%
+  mutate (year = year(DateTime)) %>%
+  mutate (site = site) %>%
+  mutate (treatment = cut(year,breaks=c(0,2003,2020),
+                          labels=c('pre-burn','post-burn'))) %>%
+  filter(month %in% c(6,7,8)) %>%
+  filter(data %in% 'ndvi') %>%
+  group_by(data,month,site,treatment) %>%
+  summarize(mean_value=mean(value))%>%
+  arrange(treatment)
+# Month 8 is the greenest
+
+
 ##### Question 5 ####
 #What month is the snowiest on average?
+
+NDSI_filterSnow <- full_long %>%
+  mutate(month = month(DateTime)) %>%
+  mutate (year = year(DateTime)) %>%
+  mutate (site = site) %>%
+  mutate (treatment = cut(year,breaks=c(0,2003,2020),
+                          labels=c('pre-burn','post-burn'))) %>%
+  filter(month %in% c(1,2,3,4,12)) %>%
+  filter(data %in% 'ndsi') %>%
+  group_by(data,month) %>%
+  summarize(mean_value=mean(value))
+# January is on avg the snowiest
