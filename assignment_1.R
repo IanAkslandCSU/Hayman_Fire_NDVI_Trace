@@ -60,9 +60,33 @@ ggplot(summer_only,aes(x=ndmi,y=ndvi,color=site)) +
 # snow index) for January - April and average NDVI for June-August?
 #In other words, does the previous year's snow cover influence vegetation
 # growth for the following summer? 
-
-
 ## Your code here
+
+
+NDSI_filter <- full_long %>%
+  mutate(month = month(DateTime)) %>%
+  mutate (year = year(DateTime)) %>%
+  #mutate (site = fulllong(site) %>%
+  filter(month %in% c(1,2,3,4)) %>%
+  filter(data %in% 'ndsi') %>%
+  group_by(data,month,year) %>%
+  summarize(mean_value=mean(value))
+
+NDVI_filter <- full_long %>%
+  mutate(month = month(DateTime)) %>%
+  mutate (year = year(DateTime)) %>%
+  filter(month %in% c(6,7,8)) %>%
+  filter(data %in% 'ndvi') %>%
+  group_by(data,month,year) %>%
+  summarize(mean_value=mean(value))
+
+NDSI_NDVI <- rbind(NDVI_filter,NDSI_filter)
+
+ggplot(NDSI_NDVI,aes(x=year,y=mean_value,color=data)) + 
+  geom_point() + 
+  theme_few() + 
+  scale_color_few() + 
+  theme(legend.position=c(0.85,0.9))
 
 ## End code for question 2 -----------------
 
