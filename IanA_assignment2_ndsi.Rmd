@@ -1,7 +1,7 @@
 ---
 title: "IanA_assignment2_ndsi"
 author: "Ian Aksland"
-date: "9/10/2019"
+date: "9/11/2019"
 output:
   html_document:
     toc: true
