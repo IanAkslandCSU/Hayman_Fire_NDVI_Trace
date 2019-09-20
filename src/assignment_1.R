@@ -62,7 +62,7 @@ ggplot(summer_only,aes(x=ndmi,y=ndvi,color=site)) +
 # growth for the following summer? 
 ## Your code here
 
-?spread
+
 NDSI_filter <- full_long %>%
   mutate(month = month(DateTime)) %>%
   mutate (year = year(DateTime)) %>%
@@ -91,6 +91,7 @@ ggplot(NDSI_NDVI,aes(x=ndvi,y=ndsi)) +
   scale_color_few() + 
   theme(legend.position=c(0.85,0.9))
 
+## No correlation from what I can tell
 ## End code for question 2 -----------------
 
 
@@ -152,6 +153,9 @@ NDVI_filterGreen <- full_long %>%
   group_by(data,month,site,treatment) %>%
   summarize(mean_value=mean(value))%>%
   arrange(treatment)
+# Month 8 is the greenest
+
+
 ##### Question 5 ####
 #What month is the snowiest on average?
 
@@ -165,3 +169,4 @@ NDSI_filterSnow <- full_long %>%
   filter(data %in% 'ndsi') %>%
   group_by(data,month) %>%
   summarize(mean_value=mean(value))
+# January is on avg the snowiest
